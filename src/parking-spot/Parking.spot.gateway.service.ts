@@ -21,6 +21,8 @@ export class ParkingSpotGatewayService
   @WebSocketServer()
   public server: Server;
 
+  public floors: any;
+
   onModuleInit() {
     console.log('Websocket listening');
   }
@@ -36,5 +38,19 @@ export class ParkingSpotGatewayService
   @SubscribeMessage('new-data')
   handleMessage(@MessageBody() data: SpotInterface) {
     this.server.emit('new-data', data);
+  }
+
+  @SubscribeMessage('create')
+  handleCreate(@MessageBody() data: any) {
+    if (this.floors === null) {
+      this.floors = data;
+    }
+    this.server.emit('update-all', this.floors);
+  }
+
+  @SubscribeMessage('update-all')
+  handleUpdate(@MessageBody() data: any) {
+    this.floors = data;
+    this.server.emit('update-all', this.floors);
   }
 }
